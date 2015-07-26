@@ -1,0 +1,45 @@
+{
+  "name": "n-mock",
+  "description": "A middleware for express or connect to generate mock data",
+  "version": "1.0.0",
+  "author": {
+    "name": "forsigner",
+    "email": "forsigner@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "express",
+    "connect",
+    "mock",
+    "n-mock",
+    "middleware"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forsigner/n-mock.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "files": [
+    "LICENSE",
+    "index.js"
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/forsigner/n-mock/issues"
+  },
+  "homepage": "https://github.com/forsigner/n-mock",
+  "_npmUser": {
+    "name": "forsigner",
+    "email": "forsigner@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "forsigner",
+      "email": "forsigner@gmail.com"
+    }
+  ]
+}

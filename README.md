@@ -20,7 +20,7 @@ You can use this middleware with express or connect
 
 ### Step 1 : create a server
 
-if express
+**if express**
 
 ```javascript
 var express = require('express');
@@ -31,7 +31,7 @@ app.use(mock(__dirname + '/mocks'));
 app.listen(3000);
 ```
 
-if connect
+**if connect**
 
 ```javascript
 var connect = require('connect');
@@ -66,7 +66,7 @@ my-project
 
 After start your server, you can use it.
 
-For example 1 :
+**For example 1 :**
 
 ```curl -i http://localhost:9999/users?_status=200``` will get response:
 
@@ -91,7 +91,7 @@ Transfer-Encoding: chunked
 ```_status=200``` mean that you get a response with http status code 200.
 By default, ```_status``` equal to ```200```. so, ```curl http://localhost:9999/users``` will get a collect response too.
 
-For example 2 :
+**For example 2 :**
 
 ```curl -X POST http://localhost:9999/users?_status=422``` will get response:
 

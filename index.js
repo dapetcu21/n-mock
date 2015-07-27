@@ -37,6 +37,10 @@ function mock(root, options) {
       return;
     }
 
+    var query = url.parse(req.url).query;
+    var status = querystring.parse(query)._status || '200';
+
+    res.statusCode = status;
     res.setHeader('Content-Type', 'application/json;charset=UTF-8');
     res.end(fs.readFileSync(mockJsonPath, 'utf8'));
     next();

@@ -47,7 +47,7 @@ app.listen(3000);
 After create a server, you can add some json file to mocks dir, for example:
 
 ``` bash
-my-projec
+my-project
 ├── app.js
 ├── mocks
 │   ├── users

@@ -1,3 +1,4 @@
+
 'use strict';
 
 /**
@@ -29,21 +30,25 @@ function mock(root, options) {
   var opts = options || {};
 
   return function mock(req, res, next) {
-    var mockJsonPath = getMockJsonPath(root, req.url, req.method);
-
-    if (!fs.existsSync(mockJsonPath)) {
-      res.end('can not found mock data');
-      next();
-      return;
-    }
 
     var query = url.parse(req.url).query;
     var status = querystring.parse(query)._status || '200';
 
-    res.statusCode = status;
-    res.setHeader('Content-Type', 'application/json;charset=UTF-8');
-    res.end(fs.readFileSync(mockJsonPath, 'utf8'));
-    next();
+    getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
+
+      if (!mockJsonPath) {
+        res.end('can not found mock data');
+        next();
+        return;
+      }
+
+      res.statusCode = status;
+      res.setHeader('Content-Type', 'application/json;charset=UTF-8');
+      res.end(fs.readFileSync(mockJsonPath, 'utf8'));
+
+      next();
+    });
+
   };
 };
 
@@ -58,9 +63,23 @@ function mock(root, options) {
  * @param {string} method
  * @return {string}
  */
-function getMockJsonPath(root, reqUrl, method) {
+function getMockJsonPath(root, reqUrl, method, callback) {
   var mockUrlPath = url.parse(reqUrl).pathname;
   var query = url.parse(reqUrl).query;
+
   var status = querystring.parse(query)._status || '200';
-  return path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.json');
+
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.json');
+
+  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.json');
+
+  fs.exists(mockJsonPath, function(exists) {
+    if (exists) return callback(mockJsonPath);
+
+    fs.exists(shortMockJsonPath, function(existsShort) {
+      if (existsShort) return callback(shortMockJsonPath);
+      return callback();
+    });
+
+  });
 };

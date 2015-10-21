@@ -31,6 +31,22 @@ function mock(root, options) {
 
   return function mock(req, res, next) {
 
+    if (req.url.indexOf('mock-api') > -1 && req.url.indexOf('mock-apis') < 0) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/html');
+      res.end(fs.readFileSync('/Users/forsigner/repos/n-mock-use-with-gulp/mocks/mock-api/index.html', 'utf8'));
+      next();
+      return;
+    }
+
+    var mockJsonPath = getMockJsonPath(root, req.url, req.method);
+
+    if (!fs.existsSync(mockJsonPath)) {
+      res.end('can not found mock data');
+      next();
+      return;
+    }
+
     var query = url.parse(req.url).query;
     var status = querystring.parse(query)._status || '200';
 

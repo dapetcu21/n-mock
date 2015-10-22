@@ -1,4 +1,3 @@
-var str = ```
 <!DOCTYPE html>
 <html>
 
@@ -61,9 +60,3 @@ var str = ```
 </body>
 
 </html>
-```;
-
-
-module.exports = {
-  data: str
-}

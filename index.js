@@ -98,7 +98,7 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 };
 
 function createHtml(mockPath) {
-  var src = path.join(__dirname, 'template', 'index.html');
+  var src = path.join(__dirname, 'CONTRIBUTING.md');
   var dest = path.join(mockPath, 'mock-api', 'index.html');
   jetpack.copy(src, dest, { overwrite: true });
 }

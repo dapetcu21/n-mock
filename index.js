@@ -9,8 +9,6 @@ var path = require('path');
 var url = require('url');
 var querystring = require('querystring');
 var jetpack = require('fs-jetpack');
-var template = require('./template');
-console.log(template);
 
 /**
  * Module exports.
@@ -42,25 +40,25 @@ function mock(root, options) {
       res.setHeader('Content-Type', 'text/html;charset=UTF-8');
       res.end(fs.readFileSync(htmlPath, 'utf8'));
       next();
-      return;
+    } else {
+
+      var query = url.parse(req.url).query;
+      var status = querystring.parse(query)._status || '200';
+
+      getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
+        if (!mockJsonPath) {
+          next();
+        } else {
+          res.statusCode = status;
+          res.setHeader('Content-Type', 'application/json;charset=UTF-8');
+          res.end(fs.readFileSync(mockJsonPath, 'utf8'));
+          next();
+        }
+
+      });
+
     }
 
-    var query = url.parse(req.url).query;
-    var status = querystring.parse(query)._status || '200';
-
-    getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
-      if (!mockJsonPath) {
-        res.end('can not found mock data');
-        next();
-        return;
-      }
-
-      res.statusCode = status;
-      res.setHeader('Content-Type', 'application/json;charset=UTF-8');
-      res.end(fs.readFileSync(mockJsonPath, 'utf8'));
-
-      next();
-    });
 
   };
 };

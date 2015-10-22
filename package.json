@@ -24,7 +24,8 @@
   "devDependencies": {},
   "files": [
     "LICENSE",
-    "index.js"
+    "index.js",
+    "template.html"
   ],
   "engines": {
     "node": ">= 0.8.0"

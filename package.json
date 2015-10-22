@@ -18,7 +18,9 @@
     "type": "git",
     "url": "git+https://github.com/forsigner/n-mock.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "fs-jetpack": "^0.7.0"
+  },
   "devDependencies": {},
   "files": [
     "LICENSE",

@@ -1,12 +1,9 @@
 # n-mock
-
-A middleware for express or connect to generate mock data.
+A middleware for Node.js (browser-sync、express、 connect) to generate mock data.
 
 Why use this module?
-
-  - Build a bridge between Frontend and Backend
-  - This allows for parallel development
-
+- Build a bridge between Frontend and Backend
+- This allows for parallel development
 
 ## Install
 
@@ -15,10 +12,27 @@ npm install n-mock
 ```
 
 ## Usage
-
 You can use this middleware with express or connect
 
 ### Step 1 : create a server
+**if browser-sync**
+
+```javascript
+var mock = require('n-mock');
+var gulp = require('gulp');
+var browserSync = require('browser-sync').create();
+
+// Static server
+gulp.task('browser-sync', function() {
+  browserSync.init({
+    server: {
+    baseDir: './',
+    middleware: [
+      mock(__dirname + '/mocks'))
+    ]}
+  });
+});
+```
 
 **if express**
 
@@ -43,34 +57,32 @@ app.listen(3000);
 ```
 
 ### Step 2 : create mock json file
-
 After create a server, you can add some json file to mocks dir, for example:
 
-``` bash
+```bash
 my-project
 ├── app.js
 ├── mocks
-│   ├── users
-│   │   ├── 1.GET.response.200.json
-│   │   ├── 1.GET.response.401.json
-│   │   └── 2.GET.response.200.json
-│   ├── users.GET.response.200.json
-│   ├── users.POST.request.json
-│   ├── users.POST.response.200.json
-│   ├── users.POST.response.422.json
-│   └── users.PUT.response.200.json
+│   ├── users
+│   │   ├── 1.GET.response.200.json
+│   │   ├── 1.GET.response.401.json
+│   │   └── 2.GET.response.200.json
+│   ├── users.GET.response.200.json
+│   ├── users.POST.request.json
+│   ├── users.POST.response.200.json
+│   ├── users.POST.response.422.json
+│   └── users.PUT.response.200.json
 └── package.json
 ```
 
 ### Step 3 : enjoy it
-
 After start your server, you can use it.
 
 **For example 1 :**
 
-```curl -i http://localhost:9999/users?_status=200``` will get response:
+`curl -i http://localhost:9999/users?_status=200` will get response:
 
-``` bash
+```bash
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
 Date: Mon, 27 Jul 2015 16:23:34 GMT
@@ -88,14 +100,13 @@ Transfer-Encoding: chunked
 }]
 ```
 
-```_status=200``` mean that you get a response with http status code 200.
-By default, ```_status``` equal to ```200```. so, ```curl http://localhost:9999/users``` will get a collect response too.
+`_status=200` mean that you get a response with http status code 200. By default, `_status` equal to `200`. so, `curl http://localhost:9999/users` will get a collect response too.
 
 **For example 2 :**
 
-```curl -X POST http://localhost:9999/users?_status=422``` will get response:
+`curl -X POST http://localhost:9999/users?_status=422` will get response:
 
-``` bash
+```bash
 
 HTTP/1.1 422 Unprocessable Entity
 Content-Type: application/json;charset=UTF-8
@@ -107,12 +118,9 @@ Transfer-Encoding: chunked
   "code" : 1234,
   "description" : "bad email format"
 }
-
 ```
 
 You can see the Complete Example:
-
-
 - [basic example]() // TODO
 - [use with gulp](https://github.com/forsigner/n-mock-use-with-gulp)
 - [use with angular]() // TODO

@@ -1,4 +1,3 @@
-
 'use strict';
 
 /**
@@ -9,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 var querystring = require('querystring');
+var jetpack = require('fs-jetpack');
 
 /**
  * Module exports.
@@ -29,20 +29,16 @@ module.exports = mock;
 function mock(root, options) {
   var opts = options || {};
 
+  createHtml(root);
+  createMockApis(root);
+
   return function mock(req, res, next) {
 
-    if (req.url.indexOf('mock-api') > -1 && req.url.indexOf('mock-apis') < 0) {
+    if (req.url.indexOf('mock-api') > -1 && req.url.indexOf('all') < 0) {
+      var htmlPath = path.join(root, 'mock-api', 'index.html');
       res.statusCode = 200;
-      res.setHeader('Content-Type', 'text/html');
-      res.end(fs.readFileSync('/Users/forsigner/repos/n-mock-use-with-gulp/mocks/mock-api/index.html', 'utf8'));
-      next();
-      return;
-    }
-
-    var mockJsonPath = getMockJsonPath(root, req.url, req.method);
-
-    if (!fs.existsSync(mockJsonPath)) {
-      res.end('can not found mock data');
+      res.setHeader('Content-Type', 'text/html;charset=UTF-8');
+      res.end(fs.readFileSync(htmlPath, 'utf8'));
       next();
       return;
     }
@@ -51,7 +47,6 @@ function mock(root, options) {
     var status = querystring.parse(query)._status || '200';
 
     getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
-
       if (!mockJsonPath) {
         res.end('can not found mock data');
         next();
@@ -99,3 +94,35 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 
   });
 };
+
+function createHtml(mockPath) {
+  var src = path.join(__dirname, 'template', 'index.html');
+  var dest = path.join(mockPath, 'mock-api', 'index.html');
+  jetpack.copy(src, dest, { overwrite: true });
+}
+
+
+function createMockApis(mockPath) {
+  var data = jetpack.find(mockPath, {
+    matching: ['*.json']
+  });
+
+  var res = [];
+
+  data.forEach(function(d) {
+    if (d.indexOf('mock-api') < 0) {
+      var item = {
+        url: d.split('mocks')[1]
+      }
+      if (jetpack.read(d)) {
+        var json = jetpack.read(d, 'json');
+        item.res = json;
+      } else {
+        item.res = null;
+      }
+      res.push(item);
+    }
+  });
+
+  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.json'), res);
+}

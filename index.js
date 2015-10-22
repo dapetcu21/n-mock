@@ -96,7 +96,7 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 };
 
 function createHtml(mockPath) {
-  var src = path.join(__dirname, '.npmignore');
+  var src = path.join(__dirname, 'template.html');
   var dest = path.join(mockPath, 'mock-api', 'index.html');
   jetpack.copy(src, dest, { overwrite: true });
 }

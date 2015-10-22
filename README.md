@@ -28,7 +28,7 @@ gulp.task('browser-sync', function() {
     server: {
     baseDir: './',
     middleware: [
-      mock(__dirname + '/mocks'))
+      mock(__dirname + '/mocks')
     ]}
   });
 });

@@ -9,6 +9,8 @@ var path = require('path');
 var url = require('url');
 var querystring = require('querystring');
 var jetpack = require('fs-jetpack');
+var template = require('./template');
+console.log(template);
 
 /**
  * Module exports.

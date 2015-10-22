@@ -1,3 +1,4 @@
+var str = ```
 <!DOCTYPE html>
 <html>
 
@@ -60,3 +61,9 @@
 </body>
 
 </html>
+```;
+
+
+module.exports = {
+  data: str
+}

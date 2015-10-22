@@ -6,6 +6,10 @@
     "name": "forsigner",
     "email": "forsigner@gmail.com"
   },
+  "main": "index.js",
+  "bin": {
+    "n-mock": "./bin/n-mock.js"
+  },
   "license": "MIT",
   "keywords": [
     "express",
@@ -19,13 +23,15 @@
     "url": "git+https://github.com/forsigner/n-mock.git"
   },
   "dependencies": {
+    "commander": "^2.9.0",
     "fs-jetpack": "^0.7.0"
   },
   "devDependencies": {},
   "files": [
     "LICENSE",
     "index.js",
-    "template.html"
+    "template.html",
+    "bin/n-mock.js"
   ],
   "engines": {
     "node": ">= 0.8.0"

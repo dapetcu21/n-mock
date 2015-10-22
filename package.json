@@ -1,7 +1,7 @@
 {
   "name": "n-mock",
   "description": "A middleware for express or connect to generate mock data.",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": {
     "name": "forsigner",
     "email": "forsigner@gmail.com"

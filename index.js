@@ -16,7 +16,6 @@ var jetpack = require('fs-jetpack');
  */
 
 module.exports = mock;
-
 /**
  * mock data
  *
@@ -33,32 +32,30 @@ function mock(root, options) {
   createMockApis(root);
 
   return function mock(req, res, next) {
+    var isMockApi = req.url.indexOf('mock-api') > -1 && req.url.indexOf('all') < 0;
+    if (isMockApi) {
 
-    if (req.url.indexOf('mock-api') > -1 && req.url.indexOf('all') < 0) {
+      // render html
       var htmlPath = path.join(root, 'mock-api', 'index.html');
       res.statusCode = 200;
-      res.setHeader('Content-Type', 'text/html;charset=UTF-8');
+      res.setHeader('Content-Type', 'text/html;charset=utf-8');
       res.end(fs.readFileSync(htmlPath, 'utf8'));
-      next();
     } else {
 
+      // response json
       var query = url.parse(req.url).query;
       var status = querystring.parse(query)._status || '200';
-
       getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
-        if (!mockJsonPath) {
-          next();
-        } else {
+
+        if (mockJsonPath) {
+          var body = JSON.stringify(jetpack.read(mockJsonPath, 'json'));
           res.statusCode = status;
-          res.setHeader('Content-Type', 'application/json;charset=UTF-8');
-          res.end(fs.readFileSync(mockJsonPath, 'utf8'));
-          next();
+          res.setHeader('Content-Type', 'application/json;charset=utf-8');
+          res.end(body);
         }
-
       });
-
     }
-
+    next();
 
   };
 };
@@ -89,40 +86,50 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 
     fs.exists(shortMockJsonPath, function(existsShort) {
       if (existsShort) return callback(shortMockJsonPath);
-      return callback();
+      return callback(false);
     });
 
   });
 };
 
+
+/**
+ * Create template for apis page
+ *
+ * @private
+ * @param {string} mockPath
+ * @return {null}
+ */
 function createHtml(mockPath) {
   var src = path.join(__dirname, 'template.html');
   var dest = path.join(mockPath, 'mock-api', 'index.html');
-  jetpack.copy(src, dest, { overwrite: true });
+  jetpack.copy(src, dest, {
+    overwrite: true
+  });
 }
 
-
+/**
+ * Create json data for apis page
+ *
+ * @private
+ * @param {string} mockPath
+ * @return {null}
+ */
 function createMockApis(mockPath) {
-  var data = jetpack.find(mockPath, {
+  var jsonFilePath = jetpack.find(mockPath, {
     matching: ['*.json']
   });
+  var data = [];
 
-  var res = [];
-
-  data.forEach(function(d) {
-    if (d.indexOf('mock-api') < 0) {
+  jsonFilePath.forEach(function(path) {
+    if (path.indexOf('mock-api') < 0) {
       var item = {
-        url: d.split('mocks')[1]
+        url: path.split('mocks')[1],
+        res: jetpack.read(path) ? jetpack.read(path, 'json') : null
       }
-      if (jetpack.read(d)) {
-        var json = jetpack.read(d, 'json');
-        item.res = json;
-      } else {
-        item.res = null;
-      }
-      res.push(item);
+      data.push(item);
     }
   });
 
-  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.json'), res);
+  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.json'), data);
 }

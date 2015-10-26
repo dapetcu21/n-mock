@@ -40,6 +40,7 @@ function mock(root, options) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'text/html;charset=utf-8');
       res.end(fs.readFileSync(htmlPath, 'utf8'));
+      next();
     } else {
 
       // response json
@@ -52,10 +53,12 @@ function mock(root, options) {
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json;charset=utf-8');
           res.end(body);
+          next();
+        } else {
+          next();
         }
       });
     }
-    next();
 
   };
 };

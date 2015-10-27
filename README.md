@@ -1,20 +1,54 @@
 # n-mock
-A middleware for Node.js (browser-sync、express、 connect) to generate mock data.
+Setup a mock server easily.
 
 Why use this module?
 - Build a bridge between Frontend and Backend
 - This allows for parallel development
 
-## Install
+## Usage
 
-```bash
-npm install n-mock
+To use n-mock, you has two choices: Cli or Middleware.
+
+### Use as command line
+
+#### Step 1 : install globally.
+
+```
+$ npm install -g n-mock
 ```
 
-## Usage
-You can use this middleware with express or connect
+#### Step 2 : create mock json file
+After create a server, you can add some json file to mocks dir, for example:
 
-### Step 1 : create a server
+```bash
+my-project
+├── app.js
+├── mocks
+│   ├── users
+│   │   ├── 1.GET.response.200.json
+│   │   ├── 1.GET.response.401.json
+│   │   └── 2.GET.response.200.json
+│   ├── users.GET.response.200.json
+│   ├── users.POST.request.json
+│   ├── users.POST.response.200.json
+│   ├── users.POST.response.422.json
+│   └── users.PUT.response.200.json
+└── package.json
+```
+
+#### Step 3 : start mock server
+
+```
+$ cd my-project/mocks
+$ n-mock --baseDir .
+```
+
+And boom!！ You will see something in you browser.
+
+
+###  Use as A middleware for Node.js (browser-sync、express、 connect).
+
+#### Step 1 : create a server
 **if browser-sync**
 
 ```javascript
@@ -56,7 +90,7 @@ app.use(mock(__dirname + '/mocks'));
 app.listen(3000);
 ```
 
-### Step 2 : create mock json file
+#### Step 2 : create mock json file
 After create a server, you can add some json file to mocks dir, for example:
 
 ```bash
@@ -75,7 +109,7 @@ my-project
 └── package.json
 ```
 
-### Step 3 : enjoy it
+#### Step 3 : enjoy it
 After start your server, you can use it.
 
 **For example 1 :**
@@ -121,7 +155,6 @@ Transfer-Encoding: chunked
 ```
 
 You can see the Complete Example:
-- [basic example]() // TODO
-- [use with gulp](https://github.com/forsigner/n-mock-use-with-gulp)
-- [use with angular]() // TODO
-- [use with reack]() // TODO
+- [use with browser-sync](https://github.com/forsigner/n-mock-with-browser-sync)
+- [use with connect](https://github.com/forsigner/n-mock-with-connect)
+- [use with express](https://github.com/forsigner/n-mock-with-express)

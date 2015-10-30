@@ -1,7 +1,7 @@
 {
   "name": "n-mock",
   "description": "A middleware for Node.js (browser-sync, express, connect) to generate mock data.",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "author": {
     "name": "forsigner",
     "email": "forsigner@gmail.com"
@@ -55,16 +55,5 @@
       "email": "forsigner@gmail.com"
     }
   ],
-  "gitHead": "bba5f4017af711bdeafbecec803eb49721c474ba",
-  "_id": "n-mock@1.0.2",
-  "_shasum": "11f9b174cbb51e967f30b8206c084444d3e8093f",
-  "_from": "n-mock@>=1.0.0 <2.0.0",
-  "_npmVersion": "2.10.1",
-  "_nodeVersion": "0.12.3",
-  "dist": {
-    "shasum": "11f9b174cbb51e967f30b8206c084444d3e8093f",
-    "tarball": "http://registry.npmjs.org/n-mock/-/n-mock-1.0.2.tgz"
-  },
-  "directories": {},
-  "_resolved": "https://registry.npmjs.org/n-mock/-/n-mock-1.0.2.tgz"
+  "directories": {}
 }

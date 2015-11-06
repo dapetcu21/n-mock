@@ -9,6 +9,20 @@ var path = require('path');
 var url = require('url');
 var querystring = require('querystring');
 var jetpack = require('fs-jetpack');
+var strip = require('strip-comments');
+
+// var jsonFilePath = jetpack.find('./mocks', {
+//     matching: ['*.json']
+//   })
+//   .forEach(function(value) {
+//
+//     jetpack.remove(value);
+//
+//     var originValue = value;
+//     var newValue = value.replace(/json/g, 'js');
+//     fs.createReadStream(originValue).pipe(fs.createWriteStream(newValue));
+//
+//   });
 
 /**
  * Module exports.
@@ -47,9 +61,11 @@ function mock(root, options) {
       var query = url.parse(req.url).query;
       var status = querystring.parse(query)._status || '200';
       getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
-
         if (mockJsonPath) {
-          var body = JSON.stringify(jetpack.read(mockJsonPath, 'json'));
+          var jsData = fs.readFileSync(mockJsonPath, 'utf8');
+          jsData = strip(jsData);
+
+          var body = JSON.stringify(JSON.parse(jsData));
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json;charset=utf-8');
           res.end(body);
@@ -80,9 +96,9 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 
   var status = querystring.parse(query)._status || '200';
 
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.json');
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.js');
 
-  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.json');
+  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.js');
 
   fs.exists(mockJsonPath, function(exists) {
     if (exists) return callback(mockJsonPath);
@@ -120,19 +136,24 @@ function createHtml(mockPath) {
  */
 function createMockApis(mockPath) {
   var jsonFilePath = jetpack.find(mockPath, {
-    matching: ['*.json']
+    matching: ['*.js']
   });
-  var data = [];
 
+  var data = [];
   jsonFilePath.forEach(function(path) {
+
     if (path.indexOf('mock-api') < 0) {
+      var jsData = jetpack.read(path);
+      jsData = strip(jsData);
+
+      var jsonData = jsData ? JSON.parse(jsData) : null;
       var item = {
         url: path.split('mocks')[1],
-        res: jetpack.read(path) ? jetpack.read(path, 'json') : null
+        res: jsonData
       }
       data.push(item);
     }
   });
 
-  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.json'), data);
+  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.js'), data);
 }

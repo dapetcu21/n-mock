@@ -52,10 +52,15 @@ function mock(root, options) {
           var jsData = fs.readFileSync(mockJsonPath, 'utf8');
           jsData = strip(jsData);
 
-          var body = JSON.stringify(JSON.parse(jsData));
+          var body =  jsData ? JSON.parse(jsData) : null;
+          body = body ? JSON.stringify(body) : null;
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json;charset=utf-8');
-          res.end(body);
+          if (body) {
+            res.end(body);
+          } else {
+            res.end();
+          }
           next();
         } else {
           next();

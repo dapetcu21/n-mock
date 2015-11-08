@@ -10,6 +10,7 @@ var url = require('url');
 var querystring = require('querystring');
 var jetpack = require('fs-jetpack');
 var strip = require('strip-comments');
+var colors = require('colors');
 
 /**
  * Module exports.
@@ -52,7 +53,12 @@ function mock(root, options) {
           var jsData = fs.readFileSync(mockJsonPath, 'utf8');
           jsData = strip(jsData);
 
-          var body =  jsData ? JSON.parse(jsData) : null;
+          try {
+            var body = jsData ? JSON.parse(jsData) : null;
+          } catch (e) {
+            console.log(colors.red('can not parse josn in file:' + mockJsonPath))
+          }
+
           body = body ? JSON.stringify(body) : null;
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json;charset=utf-8');
@@ -138,7 +144,12 @@ function createMockApis(mockPath) {
       var jsData = jetpack.read(path);
       jsData = strip(jsData);
 
-      var jsonData = jsData ? JSON.parse(jsData) : null;
+      try {
+        var jsonData = jsData ? JSON.parse(jsData) : null;
+      } catch (e) {
+        console.log(colors.red('can not parse josn in file:' + path))
+      }
+
       var item = {
         url: path.split('mocks')[1],
         res: jsonData

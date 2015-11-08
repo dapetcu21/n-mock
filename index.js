@@ -11,19 +11,6 @@ var querystring = require('querystring');
 var jetpack = require('fs-jetpack');
 var strip = require('strip-comments');
 
-// var jsonFilePath = jetpack.find('./mocks', {
-//     matching: ['*.json']
-//   })
-//   .forEach(function(value) {
-//
-//     jetpack.remove(value);
-//
-//     var originValue = value;
-//     var newValue = value.replace(/json/g, 'js');
-//     fs.createReadStream(originValue).pipe(fs.createWriteStream(newValue));
-//
-//   });
-
 /**
  * Module exports.
  * @public

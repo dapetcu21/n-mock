@@ -49,21 +49,33 @@ function mock(root, options) {
       var query = url.parse(req.url).query;
       var status = querystring.parse(query)._status || '200';
       getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
+
         if (mockJsonPath) {
-          var jsData = fs.readFileSync(mockJsonPath, 'utf8');
-          jsData = strip(jsData);
+          var reg = /```[js| js|javascript| javascript]([^`]+)```/gi;
+          var str = fs.readFileSync(mockJsonPath, 'utf8');
+          var arr = str.match(reg);
+          var resStr = null;
+          if (arr.length) {
+            arr.forEach(function(item) {
+              if (item.toString().indexOf('<response>' > -1)) {
+                resStr = item.toString();
+              }
+            });
+          }
 
           try {
-            var body = jsData ? JSON.parse(jsData) : null;
+            resStr = resStr.replace(/```js|``` js|```javascript|``` javascript|```/gi, '');
+            resStr = strip(resStr);
+            resStr = eval(resStr);
+            resStr = resStr ? JSON.stringify(resStr) : null;
           } catch (e) {
             console.log(colors.red('can not parse josn in file:' + mockJsonPath))
           }
 
-          body = body ? JSON.stringify(body) : null;
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json;charset=utf-8');
-          if (body) {
-            res.end(body);
+          if (resStr) {
+            res.end(resStr);
           } else {
             res.end();
           }
@@ -75,7 +87,8 @@ function mock(root, options) {
     }
 
   };
-};
+}
+;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -91,12 +104,9 @@ function mock(root, options) {
 function getMockJsonPath(root, reqUrl, method, callback) {
   var mockUrlPath = url.parse(reqUrl).pathname;
   var query = url.parse(reqUrl).query;
-
   var status = querystring.parse(query)._status || '200';
-
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.js');
-
-  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.js');
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.' + status + '.md');
+  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.md');
 
   fs.exists(mockJsonPath, function(exists) {
     if (exists) return callback(mockJsonPath);
@@ -107,7 +117,8 @@ function getMockJsonPath(root, reqUrl, method, callback) {
     });
 
   });
-};
+}
+;
 
 
 /**

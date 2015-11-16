@@ -43,6 +43,15 @@ function mock(root, options) {
       res.setHeader('Content-Type', 'text/html;charset=utf-8');
       res.end(fs.readFileSync(htmlPath, 'utf8'));
       next();
+    } else if(req.url === '/mock-api/all') {
+      var allData = jetpack.read(path.join(root, '/mock-api/all.GET.json'), 'json');
+      // allData = JSON.parse(allData);
+      allData = JSON.stringify(allData);
+      console.log(allData);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json;charset=utf-8');
+      res.end(allData);
+      next();
     } else {
 
       // response json
@@ -105,17 +114,11 @@ function getMockJsonPath(root, reqUrl, method, callback) {
   var mockUrlPath = url.parse(reqUrl).pathname;
   var query = url.parse(reqUrl).query;
   var status = querystring.parse(query)._status || '200';
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.' + status + '.md');
-  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.md');
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.' + '.md');
 
   fs.exists(mockJsonPath, function(exists) {
     if (exists) return callback(mockJsonPath);
-
-    fs.exists(shortMockJsonPath, function(existsShort) {
-      if (existsShort) return callback(shortMockJsonPath);
-      return callback(false);
-    });
-
+    return callback(false);
   });
 }
 ;
@@ -144,30 +147,24 @@ function createHtml(mockPath) {
  * @return {null}
  */
 function createMockApis(mockPath) {
-  var jsonFilePath = jetpack.find(mockPath, {
-    matching: ['*.js']
+  var mdFilePath = jetpack.find(mockPath, {
+    matching: ['*.md']
   });
 
   var data = [];
-  jsonFilePath.forEach(function(path) {
+  mdFilePath.forEach(function(path) {
 
     if (path.indexOf('mock-api') < 0) {
-      var jsData = jetpack.read(path);
-      jsData = strip(jsData);
-
-      try {
-        var jsonData = jsData ? JSON.parse(jsData) : null;
-      } catch (e) {
-        console.log(colors.red('can not parse josn in file:' + path))
-      }
+      var mdData = jetpack.read(path);
+      mdData = strip(mdData);
 
       var item = {
         url: path.split('mocks')[1],
-        res: jsonData
+        res: mdData
       }
       data.push(item);
     }
   });
 
-  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.js'), data);
+  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.json'), data);
 }

@@ -74,7 +74,7 @@
         var vm = this;
 
         vm.location = $location;
-        $http.get('/mock-api/all').then(function(data) {
+        $http.get('/mockie/all').then(function(data) {
           vm.apis = [];
           data.data.forEach(function(item) {
             vm.apis.push({

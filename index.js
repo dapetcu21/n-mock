@@ -30,73 +30,21 @@ module.exports = mock;
 function mock(root, options) {
   var opts = options || {};
 
-  createHtml(root);
-  createMockApis(root);
+  createTemplate(root);
+  createAllJson(root);
 
   return function mock(req, res, next) {
+    var isMockie = req.url.indexOf('mockie') > -1 && req.url.indexOf('all') < 0;
 
-    var isMockApi = req.url.indexOf('mock-api') > -1 && req.url.indexOf('all') < 0;
-    if (isMockApi) {
-
-      // render html
-      var htmlPath = path.join(root, 'mock-api', 'index.html');
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'text/html;charset=utf-8');
-      res.end(fs.readFileSync(htmlPath, 'utf8'));
-      next();
-    } else if (req.url === '/mock-api/all') {
-      var allData = jetpack.read(path.join(root, '/mock-api/all.GET.json'), 'json');
-      allData = JSON.stringify(allData);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json;charset=utf-8');
-      res.end(allData);
-      next();
+    if (isMockie) {
+      renderTemplate(req, res, next, root);
+    } else if (req.url === '/mockie/all') {
+      renderAllJson(req, res, next, root);
     } else {
-
-      // response json
-      var query = url.parse(req.url).query;
-      var status = querystring.parse(query)._status || '200';
-      getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
-
-        if (mockJsonPath) {
-          var reg = /```[js| js|javascript| javascript]([^`]+)```/gi;
-          var str = fs.readFileSync(mockJsonPath, 'utf8');
-          var arr = str.match(reg);
-          var resStr = null;
-          if (arr.length) {
-            arr.forEach(function(item) {
-              if (item.toString().indexOf('<response=200>' > -1)) {
-                resStr = item.toString();
-              }
-            });
-          }
-
-          try {
-            resStr = resStr.replace(/```js|``` js|```javascript|``` javascript|```/gi, '');
-            resStr = strip(resStr);
-            resStr = eval(resStr);
-            resStr = resStr ? JSON.stringify(resStr) : null;
-          } catch (e) {
-            console.log(colors.red('can not parse josn in file:' + mockJsonPath))
-          }
-
-          res.statusCode = status;
-          res.setHeader('Content-Type', 'application/json;charset=utf-8');
-          if (resStr) {
-            res.end(resStr);
-          } else {
-            res.end();
-          }
-          next();
-        } else {
-          next();
-        }
-      });
+      renderApis(req, res, next, root);
     }
-
   };
 }
-;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -104,24 +52,20 @@ function mock(root, options) {
  * get mock json path
  *
  * @private
- * @param {string} root
- * @param {string} mockUrlPath
- * @param {string} method
+ * @param {string} mockPath
+ * @param {object} req
  * @return {string}
  */
-function getMockJsonPath(root, reqUrl, method, callback) {
-  var mockUrlPath = url.parse(reqUrl).pathname;
-  var query = url.parse(reqUrl).query;
-  var status = querystring.parse(query)._status || '200';
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.md');
+function getMockFilePath(mockPath, req, callback) {
+  var mockUrlPath = url.parse(req.url).pathname;
+  var query = url.parse(req.url).query;
+  var mockFilePath = path.join(mockPath, mockUrlPath + '.' + req.method + '.md');
 
-  fs.exists(mockJsonPath, function(exists) {
-    if (exists) return callback(mockJsonPath);
+  fs.exists(mockFilePath, function(exists) {
+    if (exists) return callback(mockFilePath);
     return callback(false);
   });
 }
-;
-
 
 /**
  * Create template for apis page
@@ -130,12 +74,10 @@ function getMockJsonPath(root, reqUrl, method, callback) {
  * @param {string} mockPath
  * @return {null}
  */
-function createHtml(mockPath) {
+function createTemplate(mockPath) {
   var src = path.join(__dirname, 'template.html');
-  var dest = path.join(mockPath, 'mock-api', 'index.html');
-  jetpack.copy(src, dest, {
-    overwrite: true
-  });
+  var dest = path.join(mockPath, 'mockie', 'index.html');
+  jetpack.copy(src, dest, {overwrite: true});
 }
 
 /**
@@ -145,26 +87,110 @@ function createHtml(mockPath) {
  * @param {string} mockPath
  * @return {null}
  */
-function createMockApis(mockPath) {
-  var mdFilePath = jetpack.find(mockPath, {
-    matching: ['*.md']
-  });
-
+function createAllJson(mockPath) {
+  var paths = jetpack.find(mockPath, {matching: ['*.md']});
   var data = [];
-  mdFilePath.forEach(function(path) {
 
-    if (path.indexOf('mock-api') < 0) {
-      var mdData = jetpack.read(path);
-
-      var arr = path.split('mocks')[1].split('.');
+  paths.forEach(function(item) {
+    if (item.indexOf('mockie') < 0) {
+      var res = jetpack.read(item);
+      var arr = item.split('mocks')[1].split('.');
       var item = {
         url: arr[0],
         method: arr[1],
-        res: mdData
+        res: res
       }
       data.push(item);
     }
   });
 
-  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.json'), data);
+  jetpack.write(path.join(mockPath, 'mockie', 'all.json'), data);
+}
+
+/**
+ * render template
+ *
+ * @private
+ * @param {string} mockPath
+ * @param {object} res
+ * @param {object} next
+ * @return {null}
+ */
+function renderTemplate(req, res, next, mockPath) {
+  var templatePath = path.join(mockPath, 'mockie', 'index.html');
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html;charset=utf-8');
+  res.end(fs.readFileSync(templatePath, 'utf8'));
+  next();
+}
+
+/**
+ * render all.json
+ *
+ * @private
+ * @param {string} mockPath
+ * @param {object} res
+ * @param {object} next
+ * @return {null}
+ */
+function renderAllJson(req, res, next, mockPath) {
+  var data = jetpack.read(path.join(mockPath, '/mockie/all.json'), 'json');
+  data = JSON.stringify(data);
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json;charset=utf-8');
+  res.end(data);
+  next();
+}
+
+
+
+function renderApis(req, res, next, mockPath) {
+  var query = url.parse(req.url).query;
+  var status = querystring.parse(query)._status || '200';
+
+  getMockFilePath(mockPath, req, function(mockFilePath) {
+    if (!mockFilePath) {
+      return next();
+    }
+
+    var reg = /```[js| js|javascript| javascript]([^`]+)```/gi;
+    var str = fs.readFileSync(mockFilePath, 'utf8');
+    var arr = str.match(reg);
+    var resStr = null;
+
+    if (!arr || !arr.length) {
+      return next();
+    }
+
+    arr.forEach(function(item) {
+      if (item.indexOf('<response=200>') > -1) {
+        resStr = item.toString();
+      }
+    });
+
+    // if (!resStr) {
+    //   return next();
+    // }
+
+    try {
+      resStr = resStr.replace(/```js|``` js|```javascript|``` javascript|```/gi, '');
+      resStr = strip(resStr);
+      resStr= eval("(" + resStr + ")");
+      resStr = resStr ? JSON.stringify(resStr) : null;
+    } catch (e) {
+      console.log(colors.red('something wrong in file: ' + mockFilePath))
+      console.log(colors.red(e))
+    }
+
+    res.statusCode = status;
+    res.setHeader('Content-Type', 'application/json;charset=utf-8');
+
+    if (resStr) {
+      res.end(resStr);
+    } else {
+      res.end();
+    }
+    next();
+
+  });
 }

@@ -34,6 +34,7 @@ function mock(root, options) {
   createMockApis(root);
 
   return function mock(req, res, next) {
+
     var isMockApi = req.url.indexOf('mock-api') > -1 && req.url.indexOf('all') < 0;
     if (isMockApi) {
 
@@ -43,11 +44,9 @@ function mock(root, options) {
       res.setHeader('Content-Type', 'text/html;charset=utf-8');
       res.end(fs.readFileSync(htmlPath, 'utf8'));
       next();
-    } else if(req.url === '/mock-api/all') {
+    } else if (req.url === '/mock-api/all') {
       var allData = jetpack.read(path.join(root, '/mock-api/all.GET.json'), 'json');
-      // allData = JSON.parse(allData);
       allData = JSON.stringify(allData);
-      console.log(allData);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json;charset=utf-8');
       res.end(allData);
@@ -66,7 +65,7 @@ function mock(root, options) {
           var resStr = null;
           if (arr.length) {
             arr.forEach(function(item) {
-              if (item.toString().indexOf('<response>' > -1)) {
+              if (item.toString().indexOf('<response=200>' > -1)) {
                 resStr = item.toString();
               }
             });
@@ -114,7 +113,7 @@ function getMockJsonPath(root, reqUrl, method, callback) {
   var mockUrlPath = url.parse(reqUrl).pathname;
   var query = url.parse(reqUrl).query;
   var status = querystring.parse(query)._status || '200';
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.' + '.md');
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.md');
 
   fs.exists(mockJsonPath, function(exists) {
     if (exists) return callback(mockJsonPath);
@@ -156,10 +155,11 @@ function createMockApis(mockPath) {
 
     if (path.indexOf('mock-api') < 0) {
       var mdData = jetpack.read(path);
-      mdData = strip(mdData);
 
+      var arr = path.split('mocks')[1].split('.');
       var item = {
-        url: path.split('mocks')[1],
+        url: arr[0],
+        method: arr[1],
         res: mdData
       }
       data.push(item);

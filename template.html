@@ -5,6 +5,31 @@
   <meta charset="utf-8">
   <title>api</title>
   <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="//cdn.bootcss.com/highlight.js/8.9.0/styles/default.min.css" rel="stylesheet"> -->
+  <link href="//cdn.bootcss.com/highlight.js/8.8.0/styles/github.min.css" rel="stylesheet">
+  <style>
+    .hljs {
+      background: transparent;
+    }
+
+    pre {
+      border: none;
+      background-color: #f7f7f7;
+    }
+
+    .code {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      padding-top: 0;
+      border-radius: 4px;
+    }
+
+    .method {
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
 </head>
 
 <body ng-controller="AppController as vm">
@@ -12,10 +37,13 @@
     <div class="row" style="100%">
       <div class="col-md-5">
         <div class=" affix" style="height: 100%; overflow: auto; padding-top: 20px; width: 505px;">
-          <h4 id="title">All Apis <small>(点击url查看详情)</small></h4>
+          <h4 id="title">All Apis
+            <small>(点击url查看详情)</small>
+          </h4>
           <ul class="list-group">
-            <li class="list-group-item" ng-repeat="api in vm.apis">
-              <a href="#title-{{$index}}">{{api.url}}</a>
+            <li class="list-group-item" ng-repeat="api in vm.apis" ng-click="vm.getRes($index)">
+              <span class="method">{{api.method}}</span>
+              <a href="#{{$index}}">{{api.url}}</a>
             </li>
           </ul>
         </div>
@@ -23,39 +51,57 @@
       </div>
       <div class="col-md-7" style="padding-top: 20px;">
         <h4 id="title">Details</h4>
-        <div id="title-{{$index}}" class="panel panel-default" ng-repeat="api in vm.apis">
-          <div class="panel-heading">
-            {{api.url}}
-          </div>
-          <div class="panel-body">
-            <pre style="background: none; border: none;">{{api.res | json}}</pre>
-          </div>
+        <div class="code" id="code">
         </div>
       </div>
 
     </div>
   </div>
 
-
-
   <script src="//cdn.bootcss.com/jquery/3.0.0-alpha1/jquery.min.js"></script>
   <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.js"></script>
   <script src="//cdn.bootcss.com/angular.js/1.5.0-beta.1/angular.min.js"></script>
   <script src="//cdn.bootcss.com/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+  <script src="//cdn.bootcss.com/marked/0.3.5/marked.js"></script>
+  <script src="//cdn.bootcss.com/highlight.js/8.9.1/highlight.min.js"></script>
 
   <script type="text/javascript">
     angular
       .module('app', [
         'ui.router'
       ])
-      .controller('AppController', function($http) {
+      .controller('AppController', function($scope, $location, $http) {
         var vm = this;
+
+        vm.location = $location;
         $http.get('/mock-api/all').then(function(data) {
-          vm.apis = data.data;
+          vm.apis = [];
+          data.data.forEach(function(item) {
+            vm.apis.push({
+              res: marked(item.res),
+              url: item.url,
+              method: item.method
+            });
+          });
+
+          $scope.$watch('vm.location.path()', function(path) {
+            path = path || '/0';
+            var index = Number(path.replace(/\//, ''));
+            $('#code').html(vm.apis[index].res)
+            highlight();
+          });
+
         });
       });
 
     angular.bootstrap(document, ['app']);
+
+    ////////////////////////////////////////////
+    function highlight() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    }
   </script>
 </body>
 

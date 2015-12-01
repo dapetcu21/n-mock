@@ -7,9 +7,10 @@ var connect = require('connect');
 var opn = require('opn');
 var devip = require('dev-ip');
 var mock = require('../index');
+var pkg = require('../package.json');
 
 program
-  .version('v1.1.3')
+  .version('v' + pkg.version)
   .option('-v, --version', 'display version')
   .option('-b, --baseDir <path>', 'Add pineapple')
   .option('-p, --port [port]', 'Add peppers');

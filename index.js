@@ -50,13 +50,13 @@ function mock(root, options) {
       var status = querystring.parse(query)._status || '200';
       getMockJsonPath(root, req.url, req.method, function(mockJsonPath) {
         if (mockJsonPath) {
-          var jsData = fs.readFileSync(mockJsonPath, 'utf8');
-          jsData = strip(jsData);
+          var jsonData = fs.readFileSync(mockJsonPath, 'utf8');
+          jsonData = strip(jsonData);
 
           try {
-            var body = jsData ? JSON.parse(jsData) : null;
+            var body = jsonData ? JSON.parse(jsonData) : null;
           } catch (e) {
-            console.log(colors.red('can not parse josn in file:' + mockJsonPath))
+            console.log(colors.red('can not parse josn in file:' + mockJsonPath));
           }
 
           body = body ? JSON.stringify(body) : null;
@@ -67,6 +67,7 @@ function mock(root, options) {
           } else {
             res.end();
           }
+
           next();
         } else {
           next();
@@ -94,9 +95,9 @@ function getMockJsonPath(root, reqUrl, method, callback) {
 
   var status = querystring.parse(query)._status || '200';
 
-  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.js');
+  var mockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.' + status + '.json');
 
-  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.js');
+  var shortMockJsonPath = path.join(root, mockUrlPath + '.' + method + '.response.json');
 
   fs.exists(mockJsonPath, function(exists) {
     if (exists) return callback(mockJsonPath);
@@ -109,7 +110,6 @@ function getMockJsonPath(root, reqUrl, method, callback) {
   });
 };
 
-
 /**
  * Create template for apis page
  *
@@ -121,7 +121,7 @@ function createHtml(mockPath) {
   var src = path.join(__dirname, 'template.html');
   var dest = path.join(mockPath, 'mock-api', 'index.html');
   jetpack.copy(src, dest, {
-    overwrite: true
+    overwrite: true,
   });
 }
 
@@ -134,29 +134,29 @@ function createHtml(mockPath) {
  */
 function createMockApis(mockPath) {
   var jsonFilePath = jetpack.find(mockPath, {
-    matching: ['*.js']
+    matching: ['*.json'],
   });
 
   var data = [];
   jsonFilePath.forEach(function(path) {
 
     if (path.indexOf('mock-api') < 0) {
-      var jsData = jetpack.read(path);
-      jsData = strip(jsData);
+      var jsonData = jetpack.read(path);
+      jsonData = strip(jsonData);
 
       try {
-        var jsonData = jsData ? JSON.parse(jsData) : null;
+        var jsonData = jsonData ? JSON.parse(jsonData) : null;
       } catch (e) {
-        console.log(colors.red('can not parse josn in file:' + path))
+        console.log(colors.red('can not parse josn in file:' + path));
       }
 
       var item = {
         url: path.split('mocks')[1],
-        res: jsonData
-      }
+        res: jsonData,
+      };
       data.push(item);
     }
   });
 
-  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.js'), data);
+  jetpack.write(path.join(mockPath, 'mock-api', 'all.GET.response.200.json'), data);
 }

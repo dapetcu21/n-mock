@@ -17,23 +17,23 @@ To use n-mock, you has two choices: Cli or Middleware.
 $ npm install -g n-mock
 ```
 
-#### Step 2 : create mock js file
-After create a server, you can add some js file to mocks dir, for example:
+#### Step 2 : create mock json file
+After create a server, you can add some json file to mocks dir, for example:
 
 ```bash
 my-project
 ├── app.js
 ├── mocks
 │   ├── users
-│   │   ├── 1.GET.response.200.js
-│   │   ├── 1.GET.response.401.js
-│   │   └── 2.GET.response.200.js
-│   ├── users.GET.response.200.js
-│   ├── users.POST.request.js
-│   ├── users.POST.response.200.js
-│   ├── users.POST.response.422.js
-│   └── users.PUT.response.200.js
-└── package.js
+│   │   ├── 1.GET.response.200.json
+│   │   ├── 1.GET.response.401.json
+│   │   └── 2.GET.response.200.json
+│   ├── users.GET.response.200.json
+│   ├── users.POST.request.json
+│   ├── users.POST.response.200.json
+│   ├── users.POST.response.422.json
+│   └── users.PUT.response.200.json
+└── package.json
 ```
 
 #### Step 3 : start mock server
@@ -90,23 +90,23 @@ app.use(mock(__dirname + '/mocks'));
 app.listen(3000);
 ```
 
-#### Step 2 : create mock js file
-After create a server, you can add some js file to mocks dir, for example:
+#### Step 2 : create mock json file
+After create a server, you can add some json file to mocks dir, for example:
 
 ```bash
 my-project
 ├── app.js
 ├── mocks
 │   ├── users
-│   │   ├── 1.GET.response.200.js
-│   │   ├── 1.GET.response.401.js
-│   │   └── 2.GET.response.200.js
-│   ├── users.GET.response.200.js
-│   ├── users.POST.request.js
-│   ├── users.POST.response.200.js
-│   ├── users.POST.response.422.js
-│   └── users.PUT.response.200.js
-└── package.js
+│   │   ├── 1.GET.response.200.json
+│   │   ├── 1.GET.response.401.json
+│   │   └── 2.GET.response.200.json
+│   ├── users.GET.response.200.json
+│   ├── users.POST.request.json
+│   ├── users.POST.response.200.json
+│   ├── users.POST.response.422.json
+│   └── users.PUT.response.200.json
+└── package.json
 ```
 
 #### Step 3 : enjoy it

@@ -1,7 +1,7 @@
 {
   "name": "n-mock",
   "description": "A middleware for Node.js (browser-sync, express, connect) to generate mock data.",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "author": {
     "name": "forsigner",
     "email": "forsigner@gmail.com"

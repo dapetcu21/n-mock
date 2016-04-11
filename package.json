@@ -23,13 +23,13 @@
     "url": "git+https://github.com/forsigner/n-mock.git"
   },
   "dependencies": {
-    "colors": "^1.1.2",
-    "commander": "^2.9.0",
-    "connect": "^3.4.0",
-    "dev-ip": "^1.0.1",
-    "fs-jetpack": "^0.7.0",
-    "opn": "^3.0.2",
-    "strip-comments": "^0.4.1"
+    "colors": "1.1.2",
+    "commander": "2.9.0",
+    "connect": "3.4.0",
+    "dev-ip": "1.0.1",
+    "fs-jetpack": "0.7.0",
+    "opn": "3.0.2",
+    "strip-comments": "0.4.1"
   },
   "devDependencies": {},
   "files": [
